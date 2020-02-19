@@ -26,25 +26,30 @@ public class Encrypter {
 			String currentLetter = Character.toString(inputString.charAt(i));
 			if(alphabetUppercase.contains(currentLetter)) {
 				LinkedList<String> localcopy = alphabetUppercase;
-				for(int j = 0; j < caesar; j++) {
-					localcopy.pop();
+				int counter = localcopy.indexOf(currentLetter);
+				for(int j = 0; j < (counter + caesar); j++) {
+					String builder = localcopy.removeFirst();
+					localcopy.add(builder);
 				}
 				String add = localcopy.getFirst();
 				returnString = returnString + add;
-				return returnString;
 				
 			} else if(alphabetLowercase.contains(currentLetter)) {
 				LinkedList<String> localcopy = alphabetLowercase;
-				for(int j = 0; j < caesar; j++) {
-					localcopy.pop();
+				int counter = localcopy.indexOf(currentLetter);
+				for(int j = 0; j < (counter + caesar); j++) {
+					String builder = localcopy.removeFirst();
+					localcopy.add(builder);
 				}
 				String add = localcopy.getFirst();
 				returnString = returnString + add;
-				return returnString;
+				
 			} else {
 				returnString = returnString + currentLetter;
 			}
+			
 		}
+		
 		return returnString;
 	}
 }
