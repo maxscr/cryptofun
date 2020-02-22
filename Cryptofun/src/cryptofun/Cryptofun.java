@@ -6,7 +6,8 @@ public class Cryptofun {
 		//CryptoWorld cryptomania = new CryptoWorld();
 		//cryptomania.open();
 		Encrypter encrypter = new Encrypter();
-		String test = encrypter.toCaesar("Abcd", 2);
+		String test = encrypter.toVigenere("abcd", "Testung");
 		System.out.println(test);
+
 	}
 }

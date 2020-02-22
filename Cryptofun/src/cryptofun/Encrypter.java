@@ -1,5 +1,6 @@
 package cryptofun;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public class Encrypter {
@@ -17,11 +18,12 @@ public class Encrypter {
 		for(int i =0; i < lowercaseLetters.length; i++) {
 			alphabetLowercase.add(lowercaseLetters[i]);
 		}
-		
 	}
 
 	public String toCaesar(String inputString, int caesar) {
 		String returnString = "";
+		inputString = umlautGone(inputString);
+		inputString = inputString.replaceAll("[^a-zA-Z]", "");
 		for(int i = 0; i < inputString.length();i++) {
 			String currentLetter = Character.toString(inputString.charAt(i));
 			if(alphabetUppercase.contains(currentLetter)) {
@@ -47,9 +49,38 @@ public class Encrypter {
 			} else {
 				returnString = returnString + currentLetter;
 			}
-			
+		}
+		return returnString;
+	}
+	
+	public String toVigenere(String inputString, String inputkey) {
+		String returnString = "";
+		inputString = inputString.toUpperCase();
+		inputString = inputString.replaceAll("[^a-zA-Z]", "");
+		inputkey = inputkey.toUpperCase();
+		inputkey = inputkey.replaceAll("[^a-zA-Z]", "");
+		HashMap<String, String> mystery = new HashMap<String, String>();
+		for(int i = 0; i < 26;i++) {
+			for(int j = 0; j < 26;j++) {
+				String key = uppercaseLetters[i] + uppercaseLetters[j];
+				String input = uppercaseLetters[(i+j)%26];
+				mystery.put(key, input);
+			}
 		}
 		
+		for(int i = 0; i < inputString.length(); i++) {
+			String currentLetter = Character.toString(inputString.charAt(i));
+			String currentLetterKey = Character.toString(inputkey.charAt(i%inputkey.length()));
+			String currentKey = currentLetter + currentLetterKey;
+			returnString = returnString + mystery.get(currentKey);
+		}
 		return returnString;
+	}
+	
+	private String umlautGone(String inputString) {
+		inputString = inputString.replace("ä", "ae");
+		inputString = inputString.replace("ö", "oe");
+		inputString = inputString.replace("ü", "ue");
+		return inputString;
 	}
 }
