@@ -1,10 +1,13 @@
 package cryptofun;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.internal.SelectionAdapterFactory;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -12,15 +15,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.swt.widgets.Composite;
+
 
 public class CryptoWorld {
 
@@ -30,10 +29,7 @@ public class CryptoWorld {
 	private Text output;
 	private Text userinput;
 	private String encryption;
-	private Label anzeige;
-	private ToolItem caesar;
-	private ToolItem vigenere;
-	private Button encryptor;
+	
 	
 	/**
 	 * Launch the application.
@@ -81,7 +77,7 @@ public class CryptoWorld {
 		output.setBounds(526, 69, 397, 472);
 		
 		userinput = new Text(shlCryptofun, SWT.BORDER);
-		userinput.setBounds(361, 34, 236, 26);
+		userinput.setBounds(407, 34, 236, 26);
 
 		
 		Label anzeige = new Label(shlCryptofun, SWT.NONE);
@@ -99,35 +95,66 @@ public class CryptoWorld {
 		Menu datei = new Menu(mntmDatei);
 		mntmDatei.setMenu(datei);
 		
-		MenuItem openText = new MenuItem(datei, SWT.NONE);
-		openText.setText("Text öffnen");
+		MenuItem loadText = new MenuItem(datei, SWT.NONE);
+		loadText.setText("Text öffnen");
 		
-		openText.addSelectionListener(new SelectionAdapter() {
+		loadText.addSelectionListener(new SelectionAdapter() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
-				String inputString = load();
+			public void widgetSelected(SelectionEvent open) {
+				input.setText(load());
 			}
 		});
 		
-		new MenuItem(datei, SWT.SEPARATOR);
-		
 		MenuItem saveText = new MenuItem(datei, SWT.NONE);
 		saveText.setText("Text speichern");
+		
+		saveText.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent save) {
+				save(input);
+			}
+		});
 		
 		new MenuItem(datei, SWT.SEPARATOR);
 		
 		MenuItem loadEncrypted = new MenuItem(datei, SWT.NONE);
 		loadEncrypted.setText("Verschlüsselten Text öffnen");
 		
-		new MenuItem(datei, SWT.SEPARATOR);
-		
 		MenuItem saveEncrypted = new MenuItem(datei, SWT.NONE);
 		saveEncrypted.setText("Verschlüsselten Text speichern");
 		
+		MenuItem mntmEntschlsseln = new MenuItem(menu, SWT.CASCADE);
+		mntmEntschlsseln.setText("Entschlüsseln");
 		
+		Menu menu_1 = new Menu(mntmEntschlsseln);
+		mntmEntschlsseln.setMenu(menu_1);
+		
+		MenuItem Hanalyse = new MenuItem(menu_1, SWT.NONE);
+		Hanalyse.setText("Häufigkeitsanalyse");
+		
+		Hanalyse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent hanalyse) {
+				analyze();
+			}
+		});
+		
+		saveEncrypted.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent save) {
+				save(output);
+			}
+		});
+		
+		loadEncrypted.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent openE) {
+				output.setText(load());
+			}
+		});
 		
 		Button encryptor = new Button(shlCryptofun, SWT.NONE);
-		encryptor.setBounds(614, 33, 110, 30);
+		encryptor.setBounds(659, 32, 110, 30);
 		encryptor.setText("Verschlüsseln");
 		
 		encryptor.addSelectionListener(new SelectionAdapter() {
@@ -139,7 +166,7 @@ public class CryptoWorld {
 		
 		ToolBar toolBar = new ToolBar(shlCryptofun, SWT.FLAT | SWT.RIGHT);
 		toolBar.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
-		toolBar.setBounds(0, 0, 118, 28);
+		toolBar.setBounds(0, 0, 886, 28);
 		
 		ToolItem caesar = new ToolItem(toolBar, SWT.NONE);
 		caesar.setText("Cäsar");
@@ -149,6 +176,18 @@ public class CryptoWorld {
 				anzeige.setText("Geben Sie eine Zahl zwischen 0 und 26 ein: ");
 				encryptor.setText("Cäsar");
 				setCaesar();
+			}
+		});
+		
+		ToolItem masc = new ToolItem(toolBar, SWT.NONE);
+		masc.setText("Masc");
+		
+		masc.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent tMasc) {
+				anzeige.setText("Geben Sie den Schlüssel ein: ");
+				encryptor.setText("Masc");
+				setMasc();
 			}
 		});
 		
@@ -186,6 +225,10 @@ public class CryptoWorld {
 		this.encryption = "caesar";
 	}
 	
+	private void setMasc() {
+		this.encryption = "masc";
+	}
+	
 	private void toEncrypt() {
 		String outputString;
 		switch(this.encryption) {
@@ -194,8 +237,11 @@ public class CryptoWorld {
 			output.setText(outputString);
 			break;
 		case "vigenere":
-			toVigenere();
 			outputString = toVigenere();
+			output.setText(outputString);
+			break;
+		case "masc":
+			outputString = toMasc();
 			output.setText(outputString);
 			break;
 		default:
@@ -235,9 +281,34 @@ public class CryptoWorld {
 	private String toVigenere() {
 		String inputString = input.getText();
 		String inputkey = userinput.getText();
+		if(inputString == "") {
+			MessageDialog.openError(shlCryptofun, "Wirklich?", "Du musst schon einen Text eingeben...");
+			return "";
+		}
+		if(inputkey == "") {
+			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			MessageDialog.openError(shlCryptofun, "Das war nix!", "Gib einen gültigen Schlüssel an!");
+			return "";
+		}
 		String returnString;
 		return returnString = encrypter.toVigenere(inputString, inputkey);
 		
+	}
+	
+	private String toMasc() {
+		String inputString = input.getText();
+		String inputkey = userinput.getText();
+		if(inputString == "") {
+			MessageDialog.openError(shlCryptofun, "Wirklich?", "Du musst schon einen Text eingeben...");
+			return "";
+		}
+		if(inputkey == "") {
+			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			MessageDialog.openError(shlCryptofun, "Das war nix!", "Gib einen gültigen Schlüssel an!");
+			return "";
+		}
+		String returnString;
+		return returnString = encrypter.toMasc(inputString, inputkey);
 	}
 	
 	/*
@@ -245,10 +316,55 @@ public class CryptoWorld {
 	 * 
 	 */
 	
-	private String load() {
-		String returnString = "";
-		
-		
-		return returnString;
+	
+	private void analyze() {
+		Analyzor test = new Analyzor(this.output.getText());
+		test.open();
 	}
+	
+	private String load() {
+		String returnString;
+		FileDialog open = new FileDialog(shlCryptofun, SWT.OPEN);
+		open.setFilterPath("D:\\Programme\\Git\\cryptoPlayground\\Cryptofun\\save");
+		try {
+			 String fileName = open.open();
+			 deleteInput();
+			 BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName))  ;
+			 StringBuffer stringBuffer = new StringBuffer();
+			 String line = null;
+			 while((line =bufferedReader.readLine())!=null){
+				 stringBuffer.append(line).append("\n");
+			 }
+			 returnString = stringBuffer.toString();
+			 bufferedReader.close();
+			 return returnString;
+		} catch(IOException e) {
+			return "";
+		}
+		
+	}
+	
+	private void save(Text putput) {
+		FileDialog save = new FileDialog(shlCryptofun, SWT.SAVE);
+		save.setFilterPath("D:\\Programme\\Git\\cryptoPlayground\\Cryptofun\\save");
+		save.setFilterExtensions(new String[] {"*.txt", "*.*"});
+		String savingData = putput.getText();
+		String fileName = save.open();
+		if(fileName != null) {
+		        try {
+		            FileWriter fw = new FileWriter(fileName);
+		            fw.write(savingData.toString());
+		            fw.flush();
+		            fw.close();
+		        } catch (Exception ex) {
+		            ex.printStackTrace();
+		        }
+		   }   
+	}
+	
+
+	private void deleteInput() {
+		this.input.setText("");
+	}
+	
 }

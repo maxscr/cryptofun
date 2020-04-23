@@ -22,8 +22,7 @@ public class Encrypter {
 
 	public String toCaesar(String inputString, int caesar) {
 		String returnString = "";
-		inputString = umlautGone(inputString);
-		inputString = inputString.replaceAll("[^a-zA-Z]", "");
+		inputString = makeNice(inputString);
 		for(int i = 0; i < inputString.length();i++) {
 			String currentLetter = Character.toString(inputString.charAt(i));
 			if(alphabetUppercase.contains(currentLetter)) {
@@ -35,19 +34,6 @@ public class Encrypter {
 				}
 				String add = localcopy.getFirst();
 				returnString = returnString + add;
-				
-			} else if(alphabetLowercase.contains(currentLetter)) {
-				LinkedList<String> localcopy = alphabetLowercase;
-				int counter = localcopy.indexOf(currentLetter);
-				for(int j = 0; j < (counter + caesar); j++) {
-					String builder = localcopy.removeFirst();
-					localcopy.add(builder);
-				}
-				String add = localcopy.getFirst();
-				returnString = returnString + add;
-				
-			} else {
-				returnString = returnString + currentLetter;
 			}
 		}
 		return returnString;
@@ -55,10 +41,8 @@ public class Encrypter {
 	
 	public String toVigenere(String inputString, String inputkey) {
 		String returnString = "";
-		inputString = inputString.toUpperCase();
-		inputString = inputString.replaceAll("[^a-zA-Z]", "");
-		inputkey = inputkey.toUpperCase();
-		inputkey = inputkey.replaceAll("[^a-zA-Z]", "");
+		inputString = makeNice(inputString);
+		inputkey = makeNice(inputString);
 		HashMap<String, String> mystery = new HashMap<String, String>();
 		for(int i = 0; i < 26;i++) {
 			for(int j = 0; j < 26;j++) {
@@ -77,7 +61,52 @@ public class Encrypter {
 		return returnString;
 	}
 	
-	private String umlautGone(String inputString) {
+	public String toMasc(String inputString, String inputkey) {
+		String returnString = "";
+		inputString = makeNice(inputString);
+		inputkey = makeNice(inputkey);
+		String key = "";
+		for(int i = 0; i < inputkey.length();i++) {
+			if(key.indexOf(inputkey.charAt(i)) < 0 ) {
+				key = key + inputkey.charAt(i);
+			}
+		}
+		int l = key.length();
+		String upperCases = String.join("", uppercaseLetters);
+		for(int i =0; i < 26; i ++) {
+			if(key.indexOf(upperCases.charAt(i)) < 0) {
+				key = key + upperCases.charAt(i);
+			}
+		}
+		HashMap<String, String> masc = new HashMap<String, String>();
+		for(int i = 0; i < 26; i++) {
+			String keyAdd = Character.toString(key.charAt(i));
+			String alphAdd = Character.toString(upperCases.charAt(i));
+			masc.put(alphAdd,keyAdd);
+		}
+		
+		
+		for(int i = 0; i < inputString.length(); i++) {
+			String currentLetter = Character.toString(inputString.charAt(i));
+			returnString = returnString + masc.get(currentLetter);
+		}
+		
+		return returnString;
+	}
+	
+	/**
+	 * 
+	 * Hilfsmethoden
+	 */
+	
+	private static String makeNice( String inputString) {
+		inputString = umlautGone(inputString);
+		inputString = inputString.toUpperCase();
+		inputString = inputString.replaceAll("[^a-zA-Z]", "");
+		return inputString;
+	}
+	
+	private static String umlautGone(String inputString) {
 		inputString = inputString.replace("ä", "ae");
 		inputString = inputString.replace("ö", "oe");
 		inputString = inputString.replace("ü", "ue");
