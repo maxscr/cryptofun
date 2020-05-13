@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -25,15 +27,12 @@ public class CryptoWorld {
 
 	protected Shell shlCryptofun;
 	private Text input;
-	Encrypter encrypter = new Encrypter();
 	private Text output;
-	private Text userinput;
-	private String encryption;
-	
+
+
 	
 	/**
 	 * Launch the application.
-	 * @param args
 	 */
 	public static void main(String[] args) {
 		try {
@@ -63,7 +62,7 @@ public class CryptoWorld {
 	 * Create contents of the window.
 	 */
 	protected void createContents() {
-		this.encryption = "caesar";
+
 		
 		shlCryptofun = new Shell();
 		shlCryptofun.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
@@ -75,16 +74,13 @@ public class CryptoWorld {
 		
 		output = new Text(shlCryptofun, SWT.MULTI | SWT.BORDER);
 		output.setBounds(526, 69, 397, 472);
-		
-		userinput = new Text(shlCryptofun, SWT.BORDER);
-		userinput.setBounds(407, 34, 236, 26);
 
 		
 		Label anzeige = new Label(shlCryptofun, SWT.NONE);
 		anzeige.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.BOLD));
 		anzeige.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		anzeige.setBounds(10, 35, 345, 30);
-		anzeige.setText("Wählen Sie eine Verschlüsselungsmethode: ");
+		anzeige.setText("Eingabetext");
 		
 		Menu menu = new Menu(shlCryptofun, SWT.BAR);
 		shlCryptofun.setMenuBar(menu);
@@ -153,17 +149,6 @@ public class CryptoWorld {
 			}
 		});
 		
-		Button encryptor = new Button(shlCryptofun, SWT.NONE);
-		encryptor.setBounds(659, 32, 110, 30);
-		encryptor.setText("Verschlüsseln");
-		
-		encryptor.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent encrypt) {
-				toEncrypt();
-			}
-		});
-		
 		ToolBar toolBar = new ToolBar(shlCryptofun, SWT.FLAT | SWT.RIGHT);
 		toolBar.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
 		toolBar.setBounds(0, 0, 886, 28);
@@ -173,9 +158,8 @@ public class CryptoWorld {
 		caesar.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent tCaesar) {
-				anzeige.setText("Geben Sie eine Zahl zwischen 0 und 26 ein: ");
-				encryptor.setText("Cäsar");
-				setCaesar();
+				CaesarGui caesarGui = new CaesarGui();
+				output.setText(caesarGui.prepare(input.getText()));
 			}
 		});
 		
@@ -185,21 +169,29 @@ public class CryptoWorld {
 		masc.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent tMasc) {
-				anzeige.setText("Geben Sie den Schlüssel ein: ");
-				encryptor.setText("Masc");
-				setMasc();
+				MascGui mascGui = new MascGui();
+				output.setText(mascGui.prepare(input.getText()));
 			}
 		});
 		
 		ToolItem vigenere = new ToolItem(toolBar, SWT.NONE);
 		vigenere.setText("Vigenere");
-		
 		vigenere.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent tVigenere) {
-				anzeige.setText("Geben Sie den Schlüssel ein: ");
-				encryptor.setText("Vigenere");
-				setVigenere();
+				VigenereGui vigenereGui = new VigenereGui();
+				output.setText(vigenereGui.prepare(input.getText()));
+			}
+		});
+		
+		
+		ToolItem transmat = new ToolItem(toolBar, SWT.NONE);
+		transmat.setText("Transmat");
+		transmat.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent tTransmat) {
+				TransmatGui transmatGui = new TransmatGui();
+				output.setText(transmatGui.prepare(input.getText()));
 			}
 		});
 		
@@ -209,53 +201,23 @@ public class CryptoWorld {
 		label.setBounds(442, 87, 54, 47);
 		label.setText("=>");
 		
+		Label lblAusgabetext = new Label(shlCryptofun, SWT.NONE);
+		lblAusgabetext.setText("Ausgabetext");
+		lblAusgabetext.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.BOLD));
+		lblAusgabetext.setBackground(SWTResourceManager.getColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT));
+		lblAusgabetext.setBounds(526, 35, 345, 30);
+		
 		
 			
 	}
-	
-	/*
-	 * 
-	 *  Handling methods
-	 */
-	private void setVigenere() {
-		this.encryption = "vigenere";
-	}
-	
-	private void setCaesar() {
-		this.encryption = "caesar";
-	}
-	
-	private void setMasc() {
-		this.encryption = "masc";
-	}
-	
-	private void toEncrypt() {
-		String outputString;
-		switch(this.encryption) {
-		case "caesar":
-			 outputString = toCaesar();
-			output.setText(outputString);
-			break;
-		case "vigenere":
-			outputString = toVigenere();
-			output.setText(outputString);
-			break;
-		case "masc":
-			outputString = toMasc();
-			output.setText(outputString);
-			break;
-		default:
-			output.setText("Keine Methode gewählt!");
-			break;
-		}
-		
-	}
+
+
 	
 	/*
 	 * Encryption methods
 	 * 
 	 */
-	
+	/*
 	private String toCaesar() {
 		String inputString = input.getText();
 		Integer caesarinteger = 0;
@@ -311,6 +273,22 @@ public class CryptoWorld {
 		return returnString = encrypter.toMasc(inputString, inputkey);
 	}
 	
+	private String toTransmat() {
+		String inputString = input.getText();
+		String inputkey = userinput.getText();
+		if(inputString == "") {
+			MessageDialog.openError(shlCryptofun, "Wirklich?", "Du musst schon einen Text eingeben...");
+			return "";
+		}
+		if(inputkey == "") {
+			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			MessageDialog.openError(shlCryptofun, "Das war nix!", "Gib einen gültigen Schlüssel an!");
+			return "";
+		}
+		String returnString;
+		return returnString = encrypter.toTransmat(inputString, inputkey);
+	}
+	*/
 	/*
 	 * save/load
 	 * 
