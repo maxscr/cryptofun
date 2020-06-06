@@ -1,4 +1,4 @@
-package cryptofun;
+package cryptofun.decryptiontools;
 
 import java.util.ArrayList;
 import java.util.HashMap;

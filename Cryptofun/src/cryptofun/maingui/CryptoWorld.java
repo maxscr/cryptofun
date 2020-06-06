@@ -1,4 +1,4 @@
-package cryptofun;
+package cryptofun.maingui;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -13,6 +13,13 @@ import java.util.HashMap;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import cryptofun.ciphergui.CaesarGui;
+import cryptofun.ciphergui.MascGui;
+import cryptofun.ciphergui.TransmatGui;
+import cryptofun.ciphergui.VigenereGui;
+import cryptofun.decryptiontools.Analyzor;
+
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -97,7 +104,12 @@ public class CryptoWorld {
 		loadText.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent open) {
-				input.setText(load());
+				String putput = load();
+				if(putput != null) {
+					input.setText(putput);
+				} else {
+					return;
+				}
 			}
 		});
 		
@@ -145,7 +157,11 @@ public class CryptoWorld {
 		loadEncrypted.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent openE) {
-				output.setText(load());
+				String putput = "";
+				putput = load();
+				if(putput != "") {
+					output.setText(putput);
+				}
 			}
 		});
 		
@@ -159,7 +175,12 @@ public class CryptoWorld {
 			@Override
 			public void widgetSelected(SelectionEvent tCaesar) {
 				CaesarGui caesarGui = new CaesarGui();
-				output.setText(caesarGui.prepare(input.getText()));
+				String putput = caesarGui.prepare(input.getText());
+				if(putput != null) {
+					output.setText(putput);
+				} else {
+					return; 
+				}
 			}
 		});
 		
@@ -170,7 +191,10 @@ public class CryptoWorld {
 			@Override
 			public void widgetSelected(SelectionEvent tMasc) {
 				MascGui mascGui = new MascGui();
-				output.setText(mascGui.prepare(input.getText()));
+				String putput = mascGui.prepare(input.getText());
+				if(putput != null) {
+					output.setText(putput);
+				}
 			}
 		});
 		
@@ -180,7 +204,10 @@ public class CryptoWorld {
 			@Override
 			public void widgetSelected(SelectionEvent tVigenere) {
 				VigenereGui vigenereGui = new VigenereGui();
-				output.setText(vigenereGui.prepare(input.getText()));
+				String putput = vigenereGui.prepare(input.getText());
+				if(putput != null) {
+					output.setText(putput);
+				}
 			}
 		});
 		
@@ -191,7 +218,10 @@ public class CryptoWorld {
 			@Override
 			public void widgetSelected(SelectionEvent tTransmat) {
 				TransmatGui transmatGui = new TransmatGui();
-				output.setText(transmatGui.prepare(input.getText()));
+				String putput = transmatGui.prepare(input.getText());
+				if(putput != null) {
+					output.setText(putput);
+				}
 			}
 		});
 		
@@ -211,86 +241,8 @@ public class CryptoWorld {
 			
 	}
 
-
-	
 	/*
-	 * Encryption methods
-	 * 
-	 */
-	/*
-	private String toCaesar() {
-		String inputString = input.getText();
-		Integer caesarinteger = 0;
-		try {
-			caesarinteger = Integer.parseInt(userinput.getText());
-		} catch(NumberFormatException e) {
-			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
-			MessageDialog.openError(shlCryptofun, "Das war nix!", "Das war nix. Gib eine natürliche Zahl ein!");
-			return "";
-		}
-		if(caesarinteger < 0 || caesarinteger > 26) {
-			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
-			MessageDialog.openError(shlCryptofun, "Das war nix!", "Gib eine Zahl zwischen 0 und 26 ein!");
-			return "";
-		}
-		if(inputString == "") {
-			MessageDialog.openError(shlCryptofun, "Wirklich?", "Du musst schon einen Text eingeben...");
-			return "";
-		}
-		return encrypter.toCaesar(inputString, caesarinteger);
-	}
-	
-	private String toVigenere() {
-		String inputString = input.getText();
-		String inputkey = userinput.getText();
-		if(inputString == "") {
-			MessageDialog.openError(shlCryptofun, "Wirklich?", "Du musst schon einen Text eingeben...");
-			return "";
-		}
-		if(inputkey == "") {
-			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
-			MessageDialog.openError(shlCryptofun, "Das war nix!", "Gib einen gültigen Schlüssel an!");
-			return "";
-		}
-		String returnString;
-		return returnString = encrypter.toVigenere(inputString, inputkey);
-		
-	}
-	
-	private String toMasc() {
-		String inputString = input.getText();
-		String inputkey = userinput.getText();
-		if(inputString == "") {
-			MessageDialog.openError(shlCryptofun, "Wirklich?", "Du musst schon einen Text eingeben...");
-			return "";
-		}
-		if(inputkey == "") {
-			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
-			MessageDialog.openError(shlCryptofun, "Das war nix!", "Gib einen gültigen Schlüssel an!");
-			return "";
-		}
-		String returnString;
-		return returnString = encrypter.toMasc(inputString, inputkey);
-	}
-	
-	private String toTransmat() {
-		String inputString = input.getText();
-		String inputkey = userinput.getText();
-		if(inputString == "") {
-			MessageDialog.openError(shlCryptofun, "Wirklich?", "Du musst schon einen Text eingeben...");
-			return "";
-		}
-		if(inputkey == "") {
-			this.userinput.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
-			MessageDialog.openError(shlCryptofun, "Das war nix!", "Gib einen gültigen Schlüssel an!");
-			return "";
-		}
-		String returnString;
-		return returnString = encrypter.toTransmat(inputString, inputkey);
-	}
-	*/
-	/*
-	 * save/load
+	 * save/load/open
 	 * 
 	 */
 	
@@ -319,7 +271,6 @@ public class CryptoWorld {
 		} catch(IOException e) {
 			return "";
 		}
-		
 	}
 	
 	private void save(Text putput) {
@@ -327,17 +278,19 @@ public class CryptoWorld {
 		save.setFilterPath("D:\\Programme\\Git\\cryptoPlayground\\Cryptofun\\save");
 		save.setFilterExtensions(new String[] {"*.txt", "*.*"});
 		String savingData = putput.getText();
-		String fileName = save.open();
-		if(fileName != null) {
-		        try {
-		            FileWriter fw = new FileWriter(fileName);
-		            fw.write(savingData.toString());
-		            fw.flush();
-		            fw.close();
-		        } catch (Exception ex) {
-		            ex.printStackTrace();
-		        }
-		   }   
+		if(savingData !=null) {
+			String fileName = save.open();
+			if(fileName != null) {
+			        try {
+			            FileWriter fw = new FileWriter(fileName);
+			            fw.write(savingData.toString());
+			            fw.flush();
+			            fw.close();
+			        } catch (Exception ex) {
+			            ex.printStackTrace();
+			        }
+			   }   
+		}
 	}
 	
 

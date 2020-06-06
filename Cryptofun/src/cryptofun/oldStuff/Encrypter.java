@@ -1,4 +1,4 @@
-package cryptofun;
+package cryptofun.oldStuff;
 
 import java.util.Arrays;
 import java.util.HashMap;

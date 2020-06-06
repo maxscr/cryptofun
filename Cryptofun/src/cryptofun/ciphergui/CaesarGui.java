@@ -1,10 +1,22 @@
-package cryptofun;
+package cryptofun.ciphergui;
 
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.wb.swt.SWTResourceManager;
+
+import cryptofun.ciphers.Caesar;
+
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -15,6 +27,7 @@ public class CaesarGui implements CipherGui{
 	protected Shell CaesarShell;
 	private String returnString;
 	private Text key;
+	private String[] settings; 
 	
 	/**
 	 * Open the window.
@@ -26,6 +39,8 @@ public class CaesarGui implements CipherGui{
 		createContents(inputString);
 		CaesarShell.open();
 		CaesarShell.layout();
+		settings = GuiHelpers.load(new File("settings\\caesar.txt"));
+		key.setText(settings[0]);
 		while (!CaesarShell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -48,9 +63,14 @@ public class CaesarGui implements CipherGui{
 		encrypt.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Caesar encryptCaesar = new Caesar();
-				setReturn(encryptCaesar.encrypt(inputString, key.getText()));
-				CaesarShell.dispose();
+				if(testInput()) {
+					Caesar encryptCaesar = new Caesar();
+					setReturn(encryptCaesar.encrypt(inputString, key.getText()));
+					String[] savingData = new String[1];
+					savingData[0] = key.getText();
+					GuiHelpers.save(savingData, new File("settings\\caesar.txt"));
+					CaesarShell.dispose();
+				}
 			}
 		});
 		key = new Text(CaesarShell, SWT.BORDER);
@@ -64,11 +84,43 @@ public class CaesarGui implements CipherGui{
 		Button decrypt = new Button(CaesarShell, SWT.NONE);
 		decrypt.setBounds(152, 60, 120, 30);
 		decrypt.setText("Entschlüsseln");
+		decrypt.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if(testInput()) {
+					Caesar decryptCaesar = new Caesar();
+					setReturn(decryptCaesar.decrypt(inputString, key.getText()));
+					String[] savingData = new String[1];
+					savingData[0] = key.getText();
+					GuiHelpers.save(savingData, new File("settings\\caesar.txt"));
+					CaesarShell.dispose();
+				}
+			}
+		});
 	}
 	
 	private void setReturn(String returnString) {
 		this.returnString = returnString;
 	}
+	
+	@Override
+	public boolean testInput() {
+		Integer caesarinteger = 0;
+		try {
+			caesarinteger = Integer.parseInt(key.getText());
+		} catch(NumberFormatException e) {
+			this.key.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			MessageDialog.openError(CaesarShell, "Das war nix!", "Das war nix. Gib eine natürliche Zahl zwischen 0 und 26 ein!");
+			return false;
+		}
+		if(caesarinteger < 0 || caesarinteger > 26) {
+			this.key.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			MessageDialog.openError(CaesarShell, "Das war nix!", "Gib eine Zahl zwischen 0 und 26 ein!");
+			return false;
+		}
+		return true;
+	}
+
 }
 
 	

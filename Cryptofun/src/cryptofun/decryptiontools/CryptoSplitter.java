@@ -1,4 +1,4 @@
-package cryptofun;
+package cryptofun.decryptiontools;
 
 public class CryptoSplitter implements Splitter{
 

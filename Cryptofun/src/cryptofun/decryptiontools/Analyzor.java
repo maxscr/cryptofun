@@ -1,4 +1,4 @@
-package cryptofun;
+package cryptofun.decryptiontools;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;

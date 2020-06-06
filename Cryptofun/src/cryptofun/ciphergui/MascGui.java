@@ -1,12 +1,20 @@
-package cryptofun;
+package cryptofun.ciphergui;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Label;
+
+import java.io.File;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.wb.swt.SWTResourceManager;
+
+import cryptofun.ciphers.Masc;
+
 import org.eclipse.swt.widgets.Button;
 
 public class MascGui implements CipherGui{
@@ -14,7 +22,8 @@ public class MascGui implements CipherGui{
 	protected Shell MascShell;
 	private Text key;
 	private String returnString;
-
+	private String[] settings; 
+	
 
 	/**
 	 * Open the window.
@@ -25,6 +34,8 @@ public class MascGui implements CipherGui{
 		createContents(inputString);
 		MascShell.open();
 		MascShell.layout();
+		settings = GuiHelpers.load(new File("settings\\masc.txt"));
+		key.setText(settings[0]);
 		while (!MascShell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -55,9 +66,14 @@ public class MascGui implements CipherGui{
 		encrypt.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Masc encryptMasc = new Masc();
-				setReturn(encryptMasc.encrypt(inputString, key.getText()));
-				MascShell.dispose();
+				if(testInput()) {
+					Masc encryptMasc = new Masc();
+					setReturn(encryptMasc.encrypt(inputString, key.getText()));
+					String[] savingData = new String[1];
+					savingData[0] = key.getText();
+					GuiHelpers.save(savingData, new File("settings\\masc.txt"));
+					MascShell.dispose();
+				}
 			}
 		});
 		
@@ -70,4 +86,16 @@ public class MascGui implements CipherGui{
 	private void setReturn(String returnString) {
 		this.returnString = returnString; 
 	}
+
+	@Override
+	public boolean testInput() {
+		String inputkey = key.getText();
+		if(inputkey == "") {
+			this.key.setBackground(SWTResourceManager.getColor(SWT.COLOR_RED));
+			MessageDialog.openError(MascShell, "Das war nix!", "Gib einen gültigen Schlüssel an!");
+			return false;
+		}
+		return true;
+	}
+
 }

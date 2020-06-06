@@ -1,4 +1,4 @@
-package cryptofun;
+package cryptofun.ciphers;
 
 import java.util.HashMap;
 
